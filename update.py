@@ -49,7 +49,7 @@ def update(world: str, blueprint_id: int):
     shell_out(["git", "stash", "pop"], False)
 
 if __name__ == "__main__":
-    desc = "This is inteneded to update the json for a world in this repo so that the vrchat world can determine if it is out of date"
+    desc = "This is intended to update the json for a world in this repo so that the vrchat world can determine if it is out of date"
     parser = argparse.ArgumentParser(description=desc)
 
     path = pathlib.Path(__file__).parent.absolute()
