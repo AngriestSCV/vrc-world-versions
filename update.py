@@ -5,28 +5,47 @@ import json
 import subprocess
 import os
 
+def shell_out(args, check):
+    print("Running: " + ' '.join(args))
+    subprocess.run(args, check=check)
+
+    print("-------------")
+    print()
 
 def update(world: str, blueprint_id: int):
-    os.makedirs(f"worlds/{world}", exist_ok=True)
+    data_path = f"worlds/{world}/data.json"
 
-    with open(f"worlds/{world}/data.json", "r") as f:
-        try:
+    try:
+        with open(data_path, "r") as f:
             data = json.load(f)
-        except:
-            data = {}
-            pass
+    except:
+        data = {}
 
-    with open(f"worlds/{world}/data.json", "w") as f:
-        data["current"] = blueprint_id
-        f.truncate()
-        json.dump(data, f)
 
-    subprocess.run(["git", "stash", "-u"], check=True)
-    subprocess.run(["git", "pull"], check=True)
-    subprocess.run(["git", "add", f"worlds/{world}/data.json"], check=True)
-    subprocess.run(["git", "commit", "-m", f"Update {world} to use blueprint {blueprint_id}", "--author=script <bot@AngryLabs.com>"], check=True)
-    subprocess.run(["git", "push"], check=True)
-    subprocess.run(["git", "stash", "pop"], check=True)
+    shell_out(["git", "stash", "-u"], True)
+    try:
+        shell_out(["git", "reset", "--hard"], True)
+        shell_out(["git", "pull"], True)
+
+        os.makedirs(f"worlds/{world}", exist_ok=True)
+        if data.get("current", None) == blueprint_id:
+            print("Nothing to do")
+            return
+
+        with open(f"worlds/{world}/data.json", "w+") as ff:
+            data["current"] = blueprint_id
+            ff.truncate()
+            json.dump(data, ff)
+            print("Saved new data")
+
+        shell_out(["git", "add", data_path], True)
+        shell_out(["git", "commit", "-m", f"Update {world} to use blueprint {blueprint_id}", "--author=script <bot@AngryLabs.com>"], True)
+        shell_out(["git", "push"], True)
+    except Exception as ex:
+        print("Error updating", ex)
+        pass
+    shell_out(["git", "reset", "--hard"], False)
+    shell_out(["git", "stash", "pop"], False)
 
 if __name__ == "__main__":
     desc = "This is inteneded to update the json for a world in this repo so that the vrchat world can determine if it is out of date"
