@@ -17,23 +17,16 @@ def shell_out(args, check):
 def update(world: str, blueprint_id: int):
     data_path = f"worlds/{world}/data.json"
 
-    try:
-<<<<<<< Updated upstream
-        with open(data_path, "r") as f:
-            data = json.load(f)
-=======
-        with open(f"worlds/{world}/data.json", "r") as f:
-                data = json.load(f)
->>>>>>> Stashed changes
-    except:
-        data = {}
-
-
-<<<<<<< Updated upstream
     shell_out(["git", "stash", "-u"], True)
     try:
         shell_out(["git", "reset", "--hard"], True)
         shell_out(["git", "pull"], True)
+
+        try:
+            with open(data_path, "r") as f:
+                data = json.load(f)
+        except:
+            data = {}
 
         os.makedirs(f"worlds/{world}", exist_ok=True)
         if data.get("current", None) == blueprint_id:
@@ -54,14 +47,6 @@ def update(world: str, blueprint_id: int):
         pass
     shell_out(["git", "reset", "--hard"], False)
     shell_out(["git", "stash", "pop"], False)
-=======
-    subprocess.run(["git", "stash", "-u"], check=True)
-    subprocess.run(["git", "pull"])
-    subprocess.run(["git", "add", f"worlds/{world}/data.json"], check=True)
-    subprocess.run(["git", "commit", "-m", f"Update {world} to use blueprint {blueprint_id}", "--author=script <bot@AngryLabs.com>"], check=True)
-    subprocess.run(["git", "push"], check=True)
-    subprocess.run(["git", "stash", "pop"], check=True)
->>>>>>> Stashed changes
 
 if __name__ == "__main__":
     desc = "This is inteneded to update the json for a world in this repo so that the vrchat world can determine if it is out of date"
