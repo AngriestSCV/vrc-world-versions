@@ -4,6 +4,8 @@ import argparse
 import json
 import subprocess
 import os
+import pathlib
+import sys
 
 def shell_out(args, check):
     print("Running: " + ' '.join(args))
@@ -50,6 +52,9 @@ def update(world: str, blueprint_id: int):
 if __name__ == "__main__":
     desc = "This is inteneded to update the json for a world in this repo so that the vrchat world can determine if it is out of date"
     parser = argparse.ArgumentParser(description=desc)
+
+    path = pathlib.Path(__file__).parent.absolute()
+    os.chdir(str(path))
 
     parser.add_argument("world", help="The name of the world to update")
     parser.add_argument("blueprintId", help="The id of the blueprint being uploaded")
